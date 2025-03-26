@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Mannequins {
     public class CheckCompletionRate : MonoBehaviour {
-        [SerializeField] XRSocketInteractor xrWristSocket;
+        [SerializeField] List<XRSocketInteractor> interactors = new();
         // Start is called before the first frame update
         [SerializeField] private float threshold;
         private Dictionary<string, float> StylePoints = new() {
@@ -12,11 +12,14 @@ namespace Mannequins {
             {"Goth", 0},
             {"Metal", 0}
         };
-        private bool ReachedThreshold = false;
+        private bool ReachedThreshold;
         private string ThresholdReached = "none";
         void Start() {
-            xrWristSocket.selectEntered.AddListener(OnObjectPlaced);
-            xrWristSocket.selectExited.AddListener(OnObjectRemoved);
+            foreach (var interactor in interactors)
+            {
+                interactor.selectEntered.AddListener(OnObjectPlaced);
+                interactor.selectExited.AddListener(OnObjectRemoved);
+            }
         }
     
     
