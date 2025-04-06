@@ -12,8 +12,16 @@ namespace Mannequins {
             {"Goth", 0},
             {"Metal", 0}
         };
+
         private bool ReachedThreshold;
         private string ThresholdReached = "none";
+        [SerializeField] private GameObject floorSign;
+        [SerializeField] private GameObject foreheadPattern;
+        [SerializeField] private GameObject handRecognition;
+        [SerializeField] internal GameObject handGestureLeft;
+        [SerializeField] internal GameObject handGestureRight;
+        [SerializeField] internal bool inInteractionRange;
+        [SerializeField] internal bool recording;
         void Start() {
             foreach (var interactor in interactors)
             {
@@ -64,13 +72,34 @@ namespace Mannequins {
         }
 
         private void CheckThreshold() {
+            ReachedThreshold = false;
+            floorSign.SetActive(false);
+            foreheadPattern.SetActive(false);
             foreach (var kvp in StylePoints) {
                 Debug.Log(kvp.Key + " : " + kvp.Value);
                 if (kvp.Value >= threshold) {
                     ReachedThreshold = true;
                     ThresholdReached = kvp.Key;
+                    floorSign.SetActive(true);
+                    foreheadPattern.SetActive(true);
                     Debug.Log("ThresholdReached with style" + ThresholdReached);
                 }
+            }
+        }
+
+
+        public void StartRecording() {
+            if (ReachedThreshold & inInteractionRange)
+            {
+                recording = true;
+                Debug.Log("Recording");
+            }
+        }
+        public void StopRecording() {
+            if (ReachedThreshold & inInteractionRange)
+            {
+                recording = false;
+                Debug.Log("StoppedRecording");
             }
         }
     }
