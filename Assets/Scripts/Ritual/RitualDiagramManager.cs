@@ -10,6 +10,8 @@ public class RitualDiagramManager : MonoBehaviour
 {
    [SerializeField] private List<GameObject> Arrows;
    [SerializeField] private GameObject Circle;
+
+   private bool _playerInCircle;
    
 
    private void CreateDiagram()
@@ -37,12 +39,31 @@ public class RitualDiagramManager : MonoBehaviour
       if (Arrows.Count == 0)
       {
          Circle.SetActive(true);
+         GetComponent<SphereCollider>().enabled = true;
       }
    }
 
    private void Start()
    {
       CreateDiagram();
+   }
+
+   private void OnTriggerEnter(Collider other)
+   {
+      if (other.CompareTag("MainCamera"))
+      {
+         Debug.Log("Player entered circle");
+         _playerInCircle = true;
+      }
+   }
+
+   private void OnTriggerExit(Collider other)
+   {
+      if (other.CompareTag("MainCamera"))
+      {
+         Debug.Log("Player left circle");
+         _playerInCircle = false;
+      }
    }
 
    private void OnEnable()
