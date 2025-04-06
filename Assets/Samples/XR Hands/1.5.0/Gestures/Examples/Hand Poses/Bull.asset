@@ -14,5 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_HandShape: {fileID: 11400000, guid: 01e432e7f8b4af9458ff07ae8f8a04cd, type: 2}
   m_RelativeOrientation:
-    m_UserConditions: []
+    m_UserConditions:
+    - m_HandAxis: 0
+      m_AlignmentCondition: 0
+      m_ReferenceDirection: 0
+      m_AngleTolerance: 0
+      m_IgnorePositionY: 1
     m_TargetConditions: []

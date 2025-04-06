@@ -17,9 +17,9 @@ public class RitualDiagramManager : MonoBehaviour
       for (int i = 0; i < Arrows.Count; i++)
       {
          float angle = i * (360f / Arrows.Count);
-
-         // Apply rotation only on the Y-axis
+         
          Arrows[i].transform.rotation = Quaternion.Euler(0, angle, 0);
+         Arrows[i].GetComponent<RitualArrowManager>().SetIndexNumber(i);
       }
    }
 
@@ -36,7 +36,7 @@ public class RitualDiagramManager : MonoBehaviour
    {
       if (Arrows.Count == 0)
       {
-         Debug.Log("All Arrows On");
+         Circle.SetActive(true);
       }
    }
 
