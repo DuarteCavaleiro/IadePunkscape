@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -5,6 +6,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 namespace Mannequins {
     public class CheckCompletionRate : MonoBehaviour {
         [SerializeField] List<XRSocketInteractor> interactors = new();
+        [SerializeField] List<XRGrabInteractable> clothesOnMannequin = new();
         // Start is called before the first frame update
         [SerializeField] private float threshold;
         private Dictionary<string, float> StylePoints = new() {
@@ -22,6 +24,7 @@ namespace Mannequins {
         [SerializeField] internal GameObject handGestureRight;
         [SerializeField] internal bool inInteractionRange;
         [SerializeField] internal bool recording;
+
         void Start() {
             foreach (var interactor in interactors)
             {
@@ -35,6 +38,7 @@ namespace Mannequins {
             XRBaseInteractable interactable = args.interactableObject  as XRBaseInteractable;
             if (interactable != null) {
                 ArticleTraits script = interactable.GetComponent<ArticleTraits>();
+                clothesOnMannequin.Add(interactable.gameObject.GetComponent<XRGrabInteractable>());
                 if (script != null) {
                     var articlePoints = script.getStylepoints();
                     foreach (var kvp in articlePoints) {
@@ -50,11 +54,14 @@ namespace Mannequins {
                 }
             }
         }
+        
+        
     
         private void OnObjectRemoved(SelectExitEventArgs arg0)  {
             XRBaseInteractable interactable = arg0.interactableObject  as XRBaseInteractable;
             if (interactable != null) {
-                ArticleTraits script = interactable.GetComponent<ArticleTraits>();
+                ArticleTraits script = interactable.gameObject.GetComponent<ArticleTraits>();
+                clothesOnMannequin.Remove(interactable.gameObject.GetComponent<XRGrabInteractable>()); 
                 if (script != null) {
                     var articlePoints = script.getStylepoints();
                     foreach (var kvp in articlePoints) {
@@ -89,17 +96,22 @@ namespace Mannequins {
 
 
         public void StartRecording() {
-            if (ReachedThreshold & inInteractionRange)
-            {
+            if (ReachedThreshold & inInteractionRange) {
                 recording = true;
                 Debug.Log("Recording");
             }
         }
         public void StopRecording() {
-            if (ReachedThreshold & inInteractionRange)
-            {
+            if (ReachedThreshold & inInteractionRange) {
                 recording = false;
                 Debug.Log("StoppedRecording");
+                if (true) {
+                    foreach (var clothe in clothesOnMannequin) { 
+                        var currentLayers = clothe.interactionLayers;
+                        clothe.interactionLayers = currentLayers & ~InteractionLayerMask.GetMask("Default"); 
+                        handRecognition.SetActive(false);
+                    }
+                }
             }
         }
     }
