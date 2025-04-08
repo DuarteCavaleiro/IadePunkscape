@@ -8910,7 +8910,7 @@ PrefabInstance:
     - target: {fileID: 3679172096297398705, guid: 47e492fec7d311f48b7eabcbb4e2e47d, type: 3}
       propertyPath: m_HandShapeOrPose
       value: 
-      objectReference: {fileID: 11400000, guid: 01e432e7f8b4af9458ff07ae8f8a04cd, type: 2}
+      objectReference: {fileID: 11400000, guid: b1b759cfdab277e42805ae0212c3c9ad, type: 2}
     - target: {fileID: 3679172096297398705, guid: 47e492fec7d311f48b7eabcbb4e2e47d, type: 3}
       propertyPath: m_XRAllFingerShapesDebugUI
       value: 

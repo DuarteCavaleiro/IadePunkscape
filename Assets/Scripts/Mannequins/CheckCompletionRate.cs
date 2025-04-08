@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -16,12 +17,18 @@ namespace Mannequins {
         };
 
         private bool ReachedThreshold;
-        private string ThresholdReached = "none";
+        [SerializeField] private string Style = "style";
         [SerializeField] private GameObject floorSign;
         [SerializeField] private GameObject foreheadPattern;
         [SerializeField] private GameObject handRecognition;
         [SerializeField] internal GameObject handGestureLeft;
         [SerializeField] internal GameObject handGestureRight;
+
+        [SerializeField] private GameObject LeftEyeCenter;
+        [SerializeField] private GameObject RightEyeCenter;
+        [SerializeField] private GameObject LeftEyeTrail;
+        [SerializeField] private GameObject RightEyeTrail;
+        
         [SerializeField] internal bool inInteractionRange;
         [SerializeField] internal bool recording;
 
@@ -30,6 +37,41 @@ namespace Mannequins {
             {
                 interactor.selectEntered.AddListener(OnObjectPlaced);
                 interactor.selectExited.AddListener(OnObjectRemoved);
+            }
+            
+            switch (Style)
+            {
+                case "Punk":
+                    LeftEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.red;
+                    LeftEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.red;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.red;
+                    LeftEyeTrail.GetComponent<ParticleSystemRenderer>().material.color = Color.red;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.red;
+                    LeftEyeCenter.GetComponent<Light>().color = Color.red;
+                    RightEyeCenter.GetComponent<Light>().color = Color.red;
+                    break;
+                case "Goth":
+                    Color purple = new Color(0.6f, 0.2f, 0.8f, 1f);
+                    LeftEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = purple;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = purple;
+                    LeftEyeTrail.GetComponent<ParticleSystemRenderer>().material.color = purple;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = purple;
+                    LeftEyeCenter.GetComponent<Light>().color = purple;
+                    RightEyeCenter.GetComponent<Light>().color = purple;
+                    break;
+                
+                case "Metal":
+                    LeftEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.white;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.white;
+                    LeftEyeTrail.GetComponent<ParticleSystemRenderer>().material.color = Color.white;
+                    RightEyeCenter.GetComponent<ParticleSystemRenderer>().material.color = Color.white;
+                    LeftEyeCenter.GetComponent<Light>().color = Color.white;
+                    RightEyeCenter.GetComponent<Light>().color = Color.white;
+                    break;
+                
+                default:
+                    Debug.Log("No Style Set");
+                    break;
             }
         }
     
@@ -82,14 +124,29 @@ namespace Mannequins {
             ReachedThreshold = false;
             floorSign.SetActive(false);
             foreheadPattern.SetActive(false);
+
+            var leftCenterEmission = LeftEyeCenter.GetComponent<ParticleSystem>().emission;
+            var rightCenterEmission = RightEyeCenter.GetComponent<ParticleSystem>().emission;
+            
             foreach (var kvp in StylePoints) {
                 Debug.Log(kvp.Key + " : " + kvp.Value);
-                if (kvp.Value >= threshold) {
-                    ReachedThreshold = true;
-                    ThresholdReached = kvp.Key;
-                    floorSign.SetActive(true);
-                    foreheadPattern.SetActive(true);
-                    Debug.Log("ThresholdReached with style" + ThresholdReached);
+                if(kvp.Key == Style){
+                    
+                    float normalized = Mathf.InverseLerp(0f, 100f, kvp.Value);
+                    float emissionRate = normalized * 20;
+                    leftCenterEmission.rateOverTime = emissionRate;
+                    rightCenterEmission.rateOverTime = emissionRate;
+                    
+                    if (kvp.Value >= threshold) {
+                        ReachedThreshold = true;
+                        floorSign.SetActive(true);
+                        foreheadPattern.SetActive(true);
+
+                        LeftEyeCenter.GetComponent<Light>().enabled = true;
+                        RightEyeCenter.GetComponent<Light>().enabled = true;
+                        
+                        Debug.Log("ThresholdReached with style" + Style);
+                    }        
                 }
             }
         }
@@ -105,12 +162,16 @@ namespace Mannequins {
             if (ReachedThreshold & inInteractionRange) {
                 recording = false;
                 Debug.Log("StoppedRecording");
-                if (true) {
-                    foreach (var clothe in clothesOnMannequin) { 
+                if (true) 
+                {
+                    foreach (var clothe in clothesOnMannequin) 
+                    { 
                         var currentLayers = clothe.interactionLayers;
                         clothe.interactionLayers = currentLayers & ~InteractionLayerMask.GetMask("Default"); 
                         handRecognition.SetActive(false);
                     }
+                    LeftEyeTrail.SetActive(true);
+                    RightEyeCenter.SetActive(true);
                 }
             }
         }
